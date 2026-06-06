@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VendorBridge – Procurement ERP</title>
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('vb-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+    :root, [data-theme="dark"] {
+      --teal:    #2ABFBF;
+      --teal-dk: #1A8F8F;
+      --amber:   #F5A623;
+      --slate:   #1C2B3A;
+      --slate-2: #243447;
+      --slate-3: #2E4057;
+      --muted:   #6B8BA4;
+      --soft:    #EAF4F4;
+      --white:   #FFFFFF;
+      --danger:  #E05C5C;
+    }
+    [data-theme="light"] {
+      --slate:   #F0F5F5;
+      --slate-2: #FFFFFF;
+      --slate-3: #EAF4F4;
+      --muted:   #5A7A94;
+      --white:   #1C2B3A;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--slate);
+      color: var(--white);
+      overflow-x: hidden;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* ── TOP NAV ─────────────────────────────── */
+    nav.navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 60px;
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--teal), var(--teal-dk));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-icon i { color: #fff; font-size: 1.1rem; }
+    .logo-text {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.4rem;
+      color: var(--white);
+    }
+    .logo-text span { color: var(--teal); }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--teal); }
+    
+    .nav-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--muted);
+      color: var(--muted);
+      padding: 8px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .btn-outline:hover {
+      border-color: var(--teal);
+      color: var(--teal);
+      background: rgba(42,191,191,.1);
+    }
+    .btn-solid {
+      background: linear-gradient(90deg, var(--teal), var(--teal-dk));
+      border: none;
+      color: #fff;
+      padding: 9px 26px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 18px rgba(42,191,191,.3);
+      transition: all 0.2s;
+    }
+    .btn-solid:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(42,191,191,.4);
+      color: #fff;
+    }
+
+    .theme-toggle-btn {
+      background: none; border: none; color: var(--amber); cursor: pointer; font-size: 1.2rem; margin-left: 10px; transition: transform .2s;
+    }
+    .theme-toggle-btn:hover { transform: rotate(20deg); }
+
+    /* ── HERO SECTION ────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 0 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(42,191,191,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(42,191,191,.025) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: 0;
+    }
+    .hero-content {
+      max-width: 600px;
+      z-index: 10;
+      position: relative;
+    }
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(42,191,191,.1);
+      border: 1px solid rgba(42,191,191,.3);
+      border-radius: 30px;
+      color: var(--teal);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .badge-pill i { font-size: 1rem; }
+    
+    h1.hero-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(3rem, 5vw, 4.5rem);
+      line-height: 1.1;
+      margin-bottom: 24px;
+      color: var(--white);
+    }
+    h1.hero-title span {
+      color: var(--teal);
+      font-style: italic;
+    }
+    p.hero-desc {
+      font-size: 1.15rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 48px;
+      max-width: 520px;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 20px;
+    }
+    .hero-btn {
+      padding: 16px 36px;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s ease;
+    }
+    .hero-btn-primary {
+      background: linear-gradient(90deg, var(--teal), var(--teal-dk));
+      color: #fff;
+      box-shadow: 0 8px 30px rgba(42,191,191,.4);
+    }
+    .hero-btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(42,191,191,.6);
+      color: #fff;
+    }
+    .hero-btn-secondary {
+      background: var(--slate-2);
+      border: 1px solid var(--slate-3);
+      color: var(--white);
+    }
+    .hero-btn-secondary:hover {
+      background: var(--slate-3);
+      border-color: var(--teal);
+      color: var(--teal);
+    }
+
+    /* ── DECORATIVE GRAPHICS ─────────────────────── */
+    .hero-graphic {
+      position: absolute;
+      right: -5%;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 55%;
+      height: 80vh;
+      background: var(--slate-2);
+      border: 1px solid rgba(42,191,191,.15);
+      border-radius: 30px;
+      box-shadow: -20px 20px 80px rgba(0,0,0,.4);
+      z-index: 5;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-graphic::before {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(42,191,191,.15) 0%, transparent 70%);
+      top: -100px; right: -100px;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .dashboard-mockup {
+      width: 120%;
+      height: auto;
+      border-radius: 12px;
+      transform: perspective(1000px) rotateY(-12deg) rotateX(4deg);
+      box-shadow: -10px 10px 40px rgba(0,0,0,.5);
+      border: 1px solid rgba(107,139,164,.2);
+      background: var(--slate);
+      padding: 20px;
+    }
+
+    /* ── CONTENT SECTIONS ────────────────────────── */
+    .section-padding { padding: 100px 60px; }
+    .section-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.8rem;
+      color: var(--white);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .section-title span { color: var(--teal); font-style: italic; }
+    .section-subtitle {
+      text-align: center;
+      color: var(--muted);
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto 60px;
+      line-height: 1.6;
+    }
+
+    /* Features Grid */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .feature-card {
+      background: var(--slate-2);
+      border: 1px solid var(--slate-3);
+      padding: 40px 30px;
+      border-radius: 20px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--teal);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .feature-icon {
+      width: 60px; height: 60px;
+      background: rgba(42,191,191,.1);
+      color: var(--teal);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 24px;
+    }
+    .feature-card h3 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 12px;
+    }
+    .feature-card p {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* About Section */
+    .about-wrap {
+      display: flex;
+      align-items: center;
+      gap: 60px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .about-content { flex: 1; }
+    .about-image {
+      flex: 1;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid rgba(42,191,191,.15);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    }
+    .about-image img { width: 100%; height: auto; display: block; }
+
+    /* Footer */
+    .footer {
+      background: var(--slate-2);
+      border-top: 1px solid var(--slate-3);
+      padding: 60px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    /* ── RESPONSIVE ──────────────────────────────── */
+    @media (max-width: 1024px) {
+      .hero-graphic { opacity: 0.2; pointer-events: none; width: 100%; right: -20%; }
+      .hero-content { max-width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; }
+      .hero-desc { margin-left: auto; margin-right: auto; }
+      .nav-links { display: none; }
+      .feature-grid { grid-template-columns: 1fr 1fr; }
+      .about-wrap { flex-direction: column; text-align: center; }
+    }
+    @media (max-width: 768px) {
+      .feature-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="#" class="logo">
+      <div class="logo-icon"><i class="fas fa-bridge-water"></i></div>
+      <div class="logo-text">Vendor<span>Bridge</span></div>
+    </a>
+    
+    <div class="nav-links">
+      <a href="#">Home</a>
+      <a href="#about">About Us</a>
+      <a href="#features">Features</a>
+      <a href="#solutions">Solutions</a>
+      <a href="#contact">Contact</a>
+    </div>
+
+    <div class="nav-actions">
+      <a href="login.html" class="btn-outline">Log In</a>
+      <a href="registration.html" class="btn-solid">Sign Up</a>
+      <button class="theme-toggle-btn" onclick="toggleTheme()"><i class="fas fa-sun"></i></button>
+    </div>
+  </nav>
+
+  <main class="hero" id="home">
+    <div class="hero-content">
+      <div class="badge-pill">
+        <i class="fas fa-rocket"></i> VENDOR MANAGEMENT ERP
+      </div>
+      <h1 class="hero-title">
+        The Modern Way to Manage <span>Vendors</span> & Procurement.
+      </h1>
+      <p class="hero-desc">
+        VendorBridge centralizes your entire procurement lifecycle. From RFQs to invoice approvals, streamline your operations in one beautiful, paperless platform.
+      </p>
+      <div class="hero-actions">
+        <a href="registration.html" class="hero-btn hero-btn-primary">
+          Get Started <i class="fas fa-arrow-right"></i>
+        </a>
+        <a href="#features" class="hero-btn hero-btn-secondary">
+          <i class="fas fa-arrow-down"></i> Explore
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-graphic">
+      <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200&h=800" class="dashboard-mockup" alt="Dashboard Mockup"/>
+    </div>
+  </main>
+
+  <section class="section-padding" id="about" style="background: var(--slate-2);">
+    <div class="about-wrap">
+      <div class="about-image">
+        <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&q=80&w=800" alt="Team meeting"/>
+      </div>
+      <div class="about-content">
+        <h2 class="section-title" style="text-align: left;">Who <span>We Are</span></h2>
+        <p style="color: var(--muted); font-size: 1.1rem; line-height: 1.7; margin-bottom: 20px;">
+          VendorBridge was built to solve the manual chaos of traditional procurement. We realized that companies spend hundreds of hours managing spreadsheets, chasing email approvals, and losing track of invoices.
+        </p>
+        <p style="color: var(--muted); font-size: 1.1rem; line-height: 1.7;">
+          Our mission is to create a seamless, transparent bridge between your company and your suppliers. By digitizing every step of the supply chain, we help you reduce costs, enforce compliance, and make faster purchasing decisions.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-padding" id="features">
+    <h2 class="section-title">Powerful <span>Features</span></h2>
+    <p class="section-subtitle">Everything you need to automate your procurement workflow from start to finish without any manual overhead.</p>
+    
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-building"></i></div>
+        <h3>Vendor Onboarding</h3>
+        <p>Digitize supplier registrations with secure document uploads, compliance checking, and automated approval workflows.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-clipboard-list"></i></div>
+        <h3>Smart RFQs</h3>
+        <p>Send Requests for Quotations to multiple vendors instantly. Collect bids securely and compare them side-by-side.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-scale-balanced"></i></div>
+        <h3>Bid Comparison</h3>
+        <p>Auto-generate comparison matrices for incoming quotations to ensure you always pick the most cost-effective option.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-check-double"></i></div>
+        <h3>Multi-Level Approvals</h3>
+        <p>Set up robust hierarchy approvals based on budget thresholds. Never let an unauthorized purchase slip through again.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-box"></i></div>
+        <h3>Purchase Orders</h3>
+        <p>Generate precise, formatted POs with a single click and send them directly to vendors via email notifications.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-chart-pie"></i></div>
+        <h3>Real-time Analytics</h3>
+        <p>Track spending, measure vendor performance, and predict supply chain delays through our comprehensive insight dashboard.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer" id="contact">
+    <div class="logo" style="justify-content: center; margin-bottom: 20px;">
+      <div class="logo-icon"><i class="fas fa-bridge-water"></i></div>
+      <div class="logo-text">Vendor<span>Bridge</span></div>
+    </div>
+    <p>© 2026 VendorBridge ERP. All rights reserved.</p>
+  </footer>
+
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      const btn = document.querySelector('.theme-toggle-btn i');
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('vb-theme', next);
+      btn.className = next === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('vb-theme') || 'dark';
+      const btn = document.querySelector('.theme-toggle-btn i');
+      if (btn) btn.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    });
+  </script>
+</body>
+</html>
