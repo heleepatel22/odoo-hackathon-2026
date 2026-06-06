@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VendorBridge – Sign In</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="css.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+    /* ── PAGE LAYOUT ── */
+    .page-wrap {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .split-layout {
+      flex: 1;
+      display: flex;
+      min-height: calc(100vh - 62px);
+    }
+
+    /* ── LEFT BRAND PANEL ── */
+    .brand-panel {
+      width: 44%;
+      background: linear-gradient(160deg, var(--navy-3) 0%, var(--navy-4) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 56px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* decorative blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      pointer-events: none;
+    }
+    .blob-1 {
+      width: 340px; height: 340px;
+      background: rgba(124,111,224,.12);
+      top: -80px; right: -80px;
+    }
+    .blob-2 {
+      width: 220px; height: 220px;
+      background: rgba(232,184,75,.07);
+      bottom: -40px; left: -40px;
+    }
+    .blob-3 {
+      width: 160px; height: 160px;
+      background: rgba(75,184,160,.07);
+      bottom: 120px; right: 40px;
+    }
+
+    /* decorative ring */
+    .deco-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(124,111,224,.12);
+      pointer-events: none;
+    }
+    .ring-1 { width: 420px; height: 420px; top: -120px; right: -120px; }
+    .ring-2 { width: 260px; height: 260px; top: -20px; right: -20px; }
+
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(124,111,224,.12);
+      border: 1px solid rgba(124,111,224,.22);
+      border-radius: 20px;
+      padding: 6px 14px;
+      margin-bottom: 32px;
+      width: fit-content;
+    }
+    .badge-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--violet-lt);
+      animation: blink 2.2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .badge-text {
+      font-size: .7rem; font-weight: 700;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: var(--violet-lt);
+    }
+
+    .brand-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 3.2vw, 2.9rem);
+      color: var(--white);
+      line-height: 1.18;
+      margin-bottom: 20px;
+    }
+    .brand-title em { color: var(--gold); font-style: italic; }
+
+    .brand-desc {
+      color: var(--muted-lt);
+      font-size: .9rem;
+      line-height: 1.75;
+      max-width: 340px;
+      margin-bottom: 40px;
+    }
+
+    /* stats */
+    .stat-row {
+      display: flex;
+      gap: 0;
+      margin-bottom: 44px;
+    }
+    .stat-item {
+      flex: 1;
+      padding: 16px 0;
+      border-right: 1px solid var(--border-2);
+      padding-right: 20px;
+      margin-right: 20px;
+    }
+    .stat-item:last-child { border-right: none; padding-right: 0; margin-right: 0; }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.85rem;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .stat-lbl {
+      font-size: .68rem; font-weight: 600;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--muted); margin-top: 4px;
+    }
+
+    /* workflow pills */
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* ── RIGHT FORM PANEL ── */
+    .form-panel {
+      flex: 1;
+      background: var(--navy);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 52px 40px 52px;
+      overflow-y: auto;
+    }
+    .form-panel.bg-grid { background-color: var(--navy); }
+
+    .form-card {
+      width: 100%;
+      max-width: 430px;
+      padding: 44px 44px 38px;
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+
+    /* avatar */
+    .avatar-wrap {
+      display: flex; justify-content: center;
+      margin-bottom: 28px;
+    }
+    .avatar-ring {
+      width: 80px; height: 80px; border-radius: 50%;
+      border: 2px dashed var(--violet);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      background: rgba(124,111,224,.07);
+      transition: background .2s, border-style .2s;
+      position: relative; overflow: hidden;
+    }
+    .avatar-ring:hover { background: rgba(124,111,224,.14); border-style: solid; }
+    .avatar-ring i { font-size: 1.5rem; color: var(--violet-lt); }
+    #loginAvatar { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .av-badge {
+      position: absolute; bottom: 1px; right: 1px;
+      width: 22px; height: 22px;
+      background: var(--gold);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .58rem; color: #fff;
+      border: 2px solid var(--navy-2);
+    }
+
+    .form-heading {
+      text-align: center;
+      margin-bottom: 26px;
+    }
+    .form-heading h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.65rem;
+      color: var(--white);
+      margin-bottom: 5px;
+    }
+    .form-heading p { font-size: .81rem; color: var(--muted); }
+
+    /* role tabs */
+    .role-tabs {
+      display: flex;
+      background: rgba(0,0,0,.3);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 26px;
+      gap: 2px;
+    }
+    .role-tab {
+      flex: 1; text-align: center;
+      padding: 7px 4px;
+      border-radius: 7px;
+      font-size: .72rem; font-weight: 700;
+      letter-spacing: .04em;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .2s;
+      border: none; background: transparent;
+    }
+    .role-tab.active {
+      background: var(--violet);
+      color: #fff;
+      box-shadow: 0 2px 12px rgba(124,111,224,.4);
+    }
+    .role-tab:not(.active):hover { color: var(--white); }
+
+    .forgot-row {
+      display: flex; justify-content: flex-end;
+      margin-top: -8px; margin-bottom: 20px;
+    }
+    .forgot-link {
+      font-size: .78rem; color: var(--gold);
+      text-decoration: none; transition: opacity .2s;
+    }
+    .forgot-link:hover { opacity: .7; }
+
+    .signup-text {
+      text-align: center;
+      font-size: .81rem; color: var(--muted);
+    }
+    .signup-text a {
+      color: var(--gold); font-weight: 700;
+      text-decoration: none;
+    }
+    .signup-text a:hover { text-decoration: underline; }
+
+    /* responsive */
+    @media(max-width: 860px) {
+      .brand-panel { display: none; }
+      .split-layout { min-height: 100vh; }
+    }
+  </style>
+</head>
+
+<script>
+
+document.getElementById("loginForm").addEventListener("submit", async function(e){
+
+    e.preventDefault();
+
+    const response = await fetch(
+        "http://127.0.0.1:5000/api/auth/login",
+        {
+            method: "POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify({
+                email: document.getElementById("email").value,
+                password: document.getElementById("password").value
+            })
+        }
+    );
+
+    const result = await response.json();
+
+    if(result.token){
+
+        localStorage.setItem(
+            "token",
+            result.token
+        );
+
+        alert("Login Successful");
+
+        window.location.href = "dashboard.html";
+    }
+    else{
+        alert(result.message);
+    }
+
+});
+
+</script>
+
+<body>
+
+<div class="page-wrap">
+
+  <!-- TOP NAV -->
+  <nav class="top-bar">
+    <a href="login.html" class="logo">
+      <div class="logo-icon"><i class="fas fa-layer-group"></i></div>
+      <div class="logo-text">Vendor<span>Bridge</span></div>
+    </a>
+    <div class="nav-links">
+      <a href="#">Documentation</a>
+      <a href="#">Support</a>
+      <button class="btn-outline" onclick="location.href='registration.html'">Create Account</button>
+    </div>
+  </nav>
+
+  <div class="split-layout">
+
+    <!-- LEFT BRAND PANEL -->
+    <div class="brand-panel">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
+      <div class="deco-ring ring-1"></div>
+      <div class="deco-ring ring-2"></div>
+
+      <div class="brand-badge">
+        <span class="badge-dot"></span>
+        <span class="badge-text">Procurement ERP Platform</span>
+      </div>
+
+      <h1 class="brand-title">
+        Streamline Your<br/>
+        Procurement,<br/>
+        <em>Effortlessly.</em>
+      </h1>
+
+      <p class="brand-desc">
+        VendorBridge brings vendors, RFQs, approvals, purchase orders,
+        and invoices into one intelligent platform — built for modern
+        procurement teams.
+      </p>
+
+      <div class="stat-row">
+        <div class="stat-item">
+          <div class="stat-num">4</div>
+          <div class="stat-lbl">User Roles</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">8+</div>
+          <div class="stat-lbl">Modules</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">100%</div>
+          <div class="stat-lbl">Paperless</div>
+        </div>
+      </div>
+
+      <div class="pill-row">
+        <span class="wf-pill">RFQ Creation</span>
+        <span class="wf-pill">Quotations</span>
+        <span class="wf-pill">Approvals</span>
+        <span class="wf-pill">Purchase Orders</span>
+        <span class="wf-pill">Invoices</span>
+        <span class="wf-pill">Analytics</span>
+        <span class="wf-pill">Audit Logs</span>
+      </div>
+    </div>
+
+    <!-- RIGHT FORM PANEL -->
+    <div class="form-panel bg-grid">
+      <div class="form-card">
+
+        <!-- avatar upload -->
+        <div class="avatar-wrap">
+          <div class="avatar-ring" onclick="document.getElementById('loginPhotoInput').click()" title="Upload photo">
+            <img id="loginAvatar" src="" alt=""/>
+            <i class="fas fa-user" id="loginAvatarIcon"></i>
+            <div class="av-badge"><i class="fas fa-camera"></i></div>
+          </div>
+          <input type="file" id="loginPhotoInput" accept="image/*" onchange="previewAvatar('loginPhotoInput','loginAvatar','loginAvatarIcon')"/>
+        </div>
+
+        <div class="form-heading">
+          <h2>Welcome Back</h2>
+          <p>Sign in to your VendorBridge workspace</p>
+        </div>
+
+        <!-- role switcher -->
+        <div class="role-tabs">
+          <button class="role-tab active" onclick="setRole(this)">Admin</button>
+          <button class="role-tab" onclick="setRole(this)">Manager</button>
+          <button class="role-tab" onclick="setRole(this)">Officer</button>
+          <button class="role-tab" onclick="setRole(this)">Vendor</button>
+        </div>
+
+        <!-- username -->
+        <div class="field-group mb-3">
+          <label class="field-label">Username / Email <span class="field-required">*</span></label>
+          <div class="field-wrap">
+            <input class="field-input" type="text" placeholder="e.g. john@company.com"/>
+            <i class="fas fa-envelope field-icon"></i>
+          </div>
+        </div>
+
+        <!-- password -->
+        <div class="field-group mb-1">
+          <label class="field-label">Password <span class="field-required">*</span></label>
+          <div class="field-wrap">
+            <input class="field-input" type="password" id="loginPwd" placeholder="Enter your password"/>
+            <i class="fas fa-lock field-icon"></i>
+            <button class="eye-toggle" type="button" onclick="toggleEye(this,'loginPwd')">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="forgot-row">
+          <a href="#" class="forgot-link">Forgot password?</a>
+        </div>
+
+        <button class="btn-primary mb-3" onclick="location.href='registration.html'">
+          <i class="fas fa-arrow-right-to-bracket"></i> Sign In
+        </button>
+
+        <div class="divider-or"><span>OR</span></div>
+
+        <div class="signup-text">
+          Don't have an account? <a href="registration.html">Register here</a>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- end split-layout -->
+
+</div><!-- end page-wrap -->
+
+<script>
+  function setRole(btn) {
+    document.querySelectorAll('.role-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function toggleEye(btn, id) {
+    const inp = document.getElementById(id);
+    const ico = btn.querySelector('i');
+    if (inp.type === 'password') { inp.type = 'text'; ico.className = 'fas fa-eye-slash'; }
+    else { inp.type = 'password'; ico.className = 'fas fa-eye'; }
+  }
+
+  function previewAvatar(inputId, imgId, iconId) {
+    const file = document.getElementById(inputId).files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.getElementById(imgId);
+      img.src = e.target.result;
+      img.style.display = 'block';
+      document.getElementById(iconId).style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  }
+</script>
+</body>
+</html>

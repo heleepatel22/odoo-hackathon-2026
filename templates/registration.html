@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VendorBridge – Register</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="vendorbridge.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+    /* ── PAGE SCROLL LAYOUT ── */
+    .page-wrap {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .page-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 44px 24px 72px;
+      overflow-y: auto;
+    }
+
+    .form-card {
+      width: 100%;
+      max-width: 780px;
+      padding: 48px 52px 44px;
+      align-self: flex-start;
+    }
+
+    /* ── AVATAR SECTION ── */
+    .avatar-section {
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      margin-bottom: 36px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border-2);
+    }
+
+    .avatar-outer { position: relative; flex-shrink: 0; }
+    .avatar-ring {
+      width: 96px; height: 96px;
+      border-radius: 50%;
+      border: 2px dashed var(--violet);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      background: rgba(124,111,224,.07);
+      transition: background .22s, border-style .22s;
+      overflow: hidden;
+    }
+    .avatar-ring:hover { background: rgba(124,111,224,.14); border-style: solid; }
+    #regAvatarPreview { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .avatar-ring .av-icon { font-size: 1.7rem; color: var(--violet-lt); }
+
+    .av-badge {
+      position: absolute; bottom: 2px; right: 2px;
+      width: 28px; height: 28px;
+      background: var(--gold);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .65rem; color: #fff;
+      border: 2px solid var(--navy-2);
+      cursor: pointer;
+    }
+    #regPhotoInput { display: none; }
+
+    .avatar-info h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: var(--white);
+      margin-bottom: 5px;
+    }
+    .avatar-info .sub { font-size: .84rem; color: var(--muted-lt); line-height: 1.6; }
+    .file-hint {
+      margin-top: 9px;
+      font-size: .71rem;
+      color: rgba(122,144,168,.65);
+    }
+
+    /* ── FORM GRID ── */
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 28px;
+      margin-bottom: 28px;
+    }
+    .field-full { grid-column: 1 / -1; }
+
+    /* ── ROLE CARDS ── */
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .role-card {
+      border: 1px solid var(--border-2);
+      border-radius: 12px;
+      padding: 16px 8px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .22s;
+      background: rgba(0,0,0,.18);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .role-card:hover {
+      border-color: rgba(124,111,224,.4);
+      background: rgba(124,111,224,.07);
+    }
+    .role-card.selected {
+      border-color: var(--violet);
+      background: rgba(124,111,224,.12);
+      box-shadow: 0 0 0 2px rgba(124,111,224,.22);
+    }
+    .role-card input[type=radio] { display: none; }
+    .rc-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: rgba(124,111,224,.1);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 2px;
+      transition: background .2s;
+    }
+    .role-card.selected .rc-icon { background: rgba(124,111,224,.22); }
+    .rc-icon i { font-size: 1rem; color: var(--muted-lt); transition: color .2s; }
+    .role-card.selected .rc-icon i { color: var(--violet-lt); }
+    .rc-name { font-size: .76rem; font-weight: 700; color: var(--muted-lt); transition: color .2s; }
+    .role-card.selected .rc-name { color: var(--violet-lt); }
+    .rc-desc { font-size: .64rem; color: rgba(122,144,168,.6); }
+
+    /* ── PASSWORD STRENGTH ── */
+    .strength-bar-wrap {
+      display: flex; gap: 4px; margin-top: 8px;
+    }
+    .strength-seg {
+      flex: 1; height: 3px; border-radius: 2px;
+      background: rgba(122,144,168,.2); transition: background .3s;
+    }
+    .strength-label { font-size: .69rem; color: var(--muted); margin-top: 4px; }
+
+    /* ── SCROLL SECTIONS (for long form) ── */
+    .form-section {
+      padding-top: 4px;
+      margin-bottom: 4px;
+    }
+
+    /* ── ACTION ROW ── */
+    .action-row {
+      display: flex; gap: 14px;
+      margin-top: 34px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border-2);
+    }
+    .btn-primary { flex: 2; width: auto; }
+    .btn-ghost   { flex: 1; }
+
+    .terms-note {
+      text-align: center;
+      font-size: .74rem;
+      color: rgba(122,144,168,.6);
+      margin-top: 16px;
+    }
+    .terms-note a { color: var(--violet-lt); text-decoration: none; }
+    .terms-note a:hover { text-decoration: underline; }
+
+    /* ── SCROLL TO TOP BUTTON ── */
+    .scroll-top {
+      position: fixed;
+      bottom: 32px; right: 32px;
+      width: 42px; height: 42px;
+      background: var(--violet);
+      border-radius: 50%;
+      border: none;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: .9rem;
+      cursor: pointer;
+      opacity: 0; transform: translateY(12px);
+      transition: opacity .3s, transform .3s;
+      z-index: 100;
+      box-shadow: 0 4px 16px rgba(124,111,224,.4);
+    }
+    .scroll-top.visible { opacity: 1; transform: translateY(0); }
+    .scroll-top:hover { background: var(--violet-dk); }
+
+    /* ── SECTION ANCHOR LINKS ── */
+    .anchor-nav {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .anchor-pill {
+      font-size: .68rem; font-weight: 600;
+      letter-spacing: .06em; text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border-2);
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all .2s;
+      display: inline-block;
+    }
+    .anchor-pill:hover {
+      border-color: var(--violet);
+      color: var(--violet-lt);
+      background: rgba(124,111,224,.07);
+    }
+
+    @media(max-width:640px) {
+      .form-card { padding: 24px 18px; }
+      .role-grid  { grid-template-columns: 1fr 1fr; }
+      .avatar-section { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<script>
+document.getElementById("registerForm").addEventListener("submit", async function(e){
+
+    e.preventDefault();
+
+    const role = document.querySelector('input[name="role"]:checked');
+
+    const data = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value,
+        role: role ? role.value : "vendor"
+    };
+
+    const response = await fetch(
+        "http://127.0.0.1:5000/api/auth/register",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        }
+    );
+
+    const result = await response.json();
+
+    alert(result.message);
+});
+</script>
+<body>
+
+<div class="page-wrap">
+
+  <!-- TOP NAV -->
+  <nav class="top-bar">
+    <a href="login.html" class="logo">
+      <div class="logo-icon"><i class="fas fa-layer-group"></i></div>
+      <div class="logo-text">Vendor<span>Bridge</span></div>
+    </a>
+    <div class="nav-links">
+      <a href="#">Documentation</a>
+      <a href="#">Support</a>
+      <button class="btn-outline" onclick="location.href='login.html'">Sign In</button>
+    </div>
+  </nav>
+
+  <!-- PROGRESS STEPS -->
+  <div class="steps-bar">
+    <div class="steps-inner">
+      <div class="step active" id="step1">
+        <div class="step-circle">1</div>
+        <div class="step-name">Account</div>
+      </div>
+      <div class="step-line" id="line1"></div>
+      <div class="step" id="step2">
+        <div class="step-circle">2</div>
+        <div class="step-name">Organisation</div>
+      </div>
+      <div class="step-line" id="line2"></div>
+      <div class="step" id="step3">
+        <div class="step-circle">3</div>
+        <div class="step-name">Verification</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN SCROLLABLE CONTENT -->
+  <div class="page-content bg-grid" id="pageContent">
+    <div class="form-card">
+
+      <!-- ── AVATAR + INTRO ── -->
+      <div class="avatar-section">
+        <div class="avatar-outer">
+          <div class="avatar-ring" onclick="document.getElementById('regPhotoInput').click()">
+            <img id="regAvatarPreview" src="" alt=""/>
+            <i class="fas fa-camera av-icon" id="regAvatarIcon"></i>
+          </div>
+          <div class="av-badge" onclick="document.getElementById('regPhotoInput').click()">
+            <i class="fas fa-plus"></i>
+          </div>
+          <input type="file" id="regPhotoInput" accept="image/*" onchange="previewRegAvatar(event)"/>
+        </div>
+        <div class="avatar-info">
+          <h3>Create Your Account</h3>
+          <div class="sub">Join VendorBridge to manage procurement workflows,<br/>vendors, approvals, and invoices from one place.</div>
+          <div class="file-hint"><i class="fas fa-info-circle" style="margin-right:5px"></i>Upload a profile photo (JPG/PNG, max 2 MB)</div>
+        </div>
+      </div>
+
+      <!-- quick-jump anchors -->
+      <div class="anchor-nav">
+        <a class="anchor-pill" href="#sec-personal">Personal</a>
+        <a class="anchor-pill" href="#sec-role">Role</a>
+        <a class="anchor-pill" href="#sec-security">Security</a>
+        <a class="anchor-pill" href="#sec-extra">Additional</a>
+      </div>
+
+      <!-- ══ PERSONAL INFORMATION ══════════════════ -->
+      <div class="form-section" id="sec-personal">
+        <div class="section-title">Personal Information</div>
+        <div class="field-grid">
+
+          <div class="field-group">
+            <label class="field-label">First Name <span class="field-required">*</span></label>
+            <div class="field-wrap">
+              <input id="firstname" class="field-input" type="text" placeholder="John"/>
+              <i class="fas fa-user field-icon"></i>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Last Name <span class="field-required">*</span></label>
+            <div class="field-wrap">
+              <input id="lastname" class="field-input" type="text" placeholder="Doe"/>
+              <i class="fas fa-user field-icon"></i>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Email Address <span class="field-required">*</span></label>
+            <div class="field-wrap">
+              <input id="email" class="field-input" type="email" placeholder="john@company.com"/>
+              <i class="fas fa-envelope field-icon"></i>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Phone Number</label>
+            <div class="field-wrap">
+              <input id="phoneno" class="field-input" type="tel" placeholder="+91 98765 43210"/>
+              <i class="fas fa-phone field-icon"></i>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Username <span class="field-required">*</span></label>
+            <div class="field-wrap">
+              <input id="username" class="field-input" type="text" placeholder="john_vb"/>
+              <i class="fas fa-at field-icon"></i>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Country <span class="field-required">*</span></label>
+            <div class="field-wrap">
+              <select class="field-select">
+                <option value="" disabled selected>Select country…</option>
+                <option>India</option>
+                <option>United States</option>
+                <option>United Kingdom</option>
+                <option>Germany</option>
+                <option>UAE</option>
+                <option>Singapore</option>
+                <option>Australia</option>
+                <option>Other</option>
+              </select>
+              <i class="fas fa-globe field-icon"></i>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══ ROLE SELECTION ═════════════════════════ -->
+      <div class="form-section" id="sec-role">
+        <div class="section-title">Select Your Role</div>
+        <div class="role-grid">
+
+          <label class="role-card selected" onclick="pickRole(this)">
+            <input type="radio" name="role" value="admin" checked/>
+            <div class="rc-icon"><i class="fas fa-shield-halved"></i></div>
+            <div class="rc-name">Admin</div>
+            <div class="rc-desc">Full system access</div>
+          </label>
+
+          <label class="role-card" onclick="pickRole(this)">
+            <input type="radio" name="role" value="manager"/>
+            <div class="rc-icon"><i class="fas fa-user-tie"></i></div>
+            <div class="rc-name">Manager</div>
+            <div class="rc-desc">Approve / Reject</div>
+          </label>
+
+          <label class="role-card" onclick="pickRole(this)">
+            <input type="radio" name="role" value="officer"/>
+            <div class="rc-icon"><i class="fas fa-file-contract"></i></div>
+            <div class="rc-name">Officer</div>
+            <div class="rc-desc">Create RFQs & POs</div>
+          </label>
+
+          <label class="role-card" onclick="pickRole(this)">
+            <input type="radio" name="role" value="vendor"/>
+            <div class="rc-icon"><i class="fas fa-store"></i></div>
+            <div class="rc-name">Vendor</div>
+            <div class="rc-desc">Submit quotations</div>
+          </label>
+
+        </div>
+      </div>
+
+      <!-- ══ SECURITY ══════════════════════════════ -->
+      <div class="form-section" id="sec-security">
+        <div class="section-title">Security</div>
+        <div class="field-grid">
+
+          <div class="field-group">
+            <label class="field-label">Password <span class="field-required">*</span></label>
+            <div class="field-wrap">
+              <input class="field-input" type="password" id="regPwd" placeholder="Min 8 characters" oninput="checkStrength(this.value)"/>
+              <i class="fas fa-lock field-icon"></i>
+              <button class="eye-toggle" type="button" onclick="toggleEye(this,'regPwd')">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <div class="strength-bar-wrap">
+              <div class="strength-seg" id="s1"></div>
+              <div class="strength-seg" id="s2"></div>
+              <div class="strength-seg" id="s3"></div>
+              <div class="strength-seg" id="s4"></div>
+            </div>
+            <div class="strength-label" id="strengthLbl">Enter a password</div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Confirm Password <span class="field-required">*</span></label>
+            <div class="field-wrap">
+              <input class="field-input" type="password" id="confirmPwd" placeholder="Repeat password"/>
+              <i class="fas fa-lock-open field-icon"></i>
+              <button class="eye-toggle" type="button" onclick="toggleEye(this,'confirmPwd')">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══ ADDITIONAL INFORMATION ════════════════ -->
+      <div class="form-section" id="sec-extra">
+        <div class="section-title">Additional Information</div>
+        <div class="field-grid">
+
+          <div class="field-group">
+            <label class="field-label">Department</label>
+            <div class="field-wrap">
+              <select class="field-select">
+                <option value="" disabled selected>Select department…</option>
+                <option>Procurement</option>
+                <option>Finance</option>
+                <option>Operations</option>
+                <option>IT</option>
+                <option>HR</option>
+                <option>Other</option>
+              </select>
+              <i class="fas fa-building field-icon"></i>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Employee / Vendor ID</label>
+            <div class="field-wrap">
+              <input class="field-input" type="text" placeholder="e.g. EMP-00123"/>
+              <i class="fas fa-id-card field-icon"></i>
+            </div>
+          </div>
+
+          <div class="field-group field-full">
+            <label class="field-label">About / Notes</label>
+            <div class="field-wrap">
+              <textarea class="field-textarea" placeholder="Tell us about your role or any additional context relevant to procurement operations…"></textarea>
+              <i class="fas fa-pen-to-square field-icon" style="top:14px;transform:none;"></i>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── ACTIONS ── -->
+      <div class="action-row">
+        <button class="btn-ghost" onclick="location.href='login.html'">
+          <i class="fas fa-arrow-left" style="margin-right:6px"></i> Back to Login
+        </button>
+        <button class="btn-primary" onclick="handleRegister()">
+          <i class="fas fa-user-plus"></i> Create Account
+        </button>
+      </div>
+
+      <div class="terms-note">
+        By registering you agree to VendorBridge's
+        <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+      </div>
+
+    </div><!-- end form-card -->
+  </div><!-- end page-content -->
+
+</div><!-- end page-wrap -->
+
+<!-- SCROLL-TO-TOP BUTTON -->
+<button class="scroll-top" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <i class="fas fa-chevron-up"></i>
+</button>
+
+<!-- SUCCESS TOAST -->
+<div class="toast-success" id="successToast">
+  <i class="fas fa-circle-check"></i> Account created! Redirecting to login…
+</div>
+
+<script>
+  /* ── scroll-to-top visibility ── */
+  window.addEventListener('scroll', () => {
+    const btn = document.getElementById('scrollTopBtn');
+    if (window.scrollY > 260) btn.classList.add('visible');
+    else btn.classList.remove('visible');
+  });
+
+  /* ── role card pick ── */
+  function pickRole(card) {
+    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    card.querySelector('input[type=radio]').checked = true;
+  }
+
+  /* ── avatar preview ── */
+  function previewRegAvatar(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.getElementById('regAvatarPreview');
+      img.src = e.target.result;
+      img.style.display = 'block';
+      document.getElementById('regAvatarIcon').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /* ── password strength ── */
+  function checkStrength(val) {
+    const segs = ['s1','s2','s3','s4'].map(id => document.getElementById(id));
+    const lbl  = document.getElementById('strengthLbl');
+    let score = 0;
+    if (val.length >= 8)          score++;
+    if (/[A-Z]/.test(val))        score++;
+    if (/[0-9]/.test(val))        score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const clrs = ['','#E07878','#E8B84B','#7C6FE0','#4BC48A'];
+    const lbls = ['Enter a password','Weak','Fair','Good','Strong ✓'];
+    segs.forEach((s,i) => { s.style.background = i < score ? clrs[score] : 'rgba(122,144,168,.2)'; });
+    lbl.textContent = lbls[score];
+    lbl.style.color = clrs[score] || 'var(--muted)';
+  }
+
+  /* ── eye toggle ── */
+  function toggleEye(btn, id) {
+    const inp = document.getElementById(id);
+    const ico = btn.querySelector('i');
+    if (inp.type === 'password') { inp.type = 'text'; ico.className = 'fas fa-eye-slash'; }
+    else { inp.type = 'password'; ico.className = 'fas fa-eye'; }
+  }
+
+  /* ── register & redirect ── */
+  function handleRegister() {
+    const btn = document.querySelector('.btn-primary');
+    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Creating account…';
+    btn.style.opacity = '.8';
+    btn.disabled = true;
+
+    setTimeout(() => {
+      /* advance step indicator */
+      const s1 = document.getElementById('step1');
+      const l1 = document.getElementById('line1');
+      const s2 = document.getElementById('step2');
+      s1.classList.remove('active'); s1.classList.add('done');
+      s1.querySelector('.step-circle').innerHTML = '<i class="fas fa-check" style="font-size:.62rem"></i>';
+      l1.classList.add('done');
+      s2.classList.add('active');
+
+      btn.innerHTML = '<i class="fas fa-circle-check"></i> Account Created!';
+      btn.style.background = 'linear-gradient(90deg,#4BC48A,#339966)';
+      btn.style.opacity = '1';
+
+      /* show toast */
+      const toast = document.getElementById('successToast');
+      toast.classList.add('show');
+
+      /* redirect after delay */
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 2200);
+    }, 1700);
+  }
+</script>
+</body>
+</html>
