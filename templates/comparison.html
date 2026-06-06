@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VendorBridge – Quotation Comparison</title>
+  <meta name="description" content="Compare vendor quotations side-by-side for informed procurement decisions."/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <link href="css/style.css" rel="stylesheet"/>
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('vb-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+</head>
+<body>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <a href="dashboard.html" class="sidebar-logo"><div class="sidebar-logo-icon"><i class="fas fa-bridge-water"></i></div><div class="sidebar-logo-text">Vendor<span>Bridge</span></div></a>
+    <nav class="nav-section">
+      <div class="nav-section-label">Main</div>
+      <a href="dashboard.html" class="nav-item"><i class="fas fa-th-large nav-icon"></i><span class="nav-text">Dashboard</span></a>
+      <a href="vendors.html" class="nav-item"><i class="fas fa-building nav-icon"></i><span class="nav-text">Vendors</span></a>
+      <a href="rfqs.html" class="nav-item"><i class="fas fa-clipboard-list nav-icon"></i><span class="nav-text">RFQs</span></a>
+      <a href="quotations.html" class="nav-item"><i class="fas fa-comments-dollar nav-icon"></i><span class="nav-text">Quotations</span></a>
+      <a href="comparison.html" class="nav-item active"><i class="fas fa-scale-balanced nav-icon"></i><span class="nav-text">Comparison</span></a>
+      <a href="approvals.html" class="nav-item"><i class="fas fa-check-double nav-icon"></i><span class="nav-text">Approvals</span><span class="nav-badge">5</span></a>
+      <div class="nav-section-label" style="margin-top:12px">Orders & Finance</div>
+      <a href="purchase-orders.html" class="nav-item"><i class="fas fa-box nav-icon"></i><span class="nav-text">Purchase Orders</span></a>
+      <a href="invoices.html" class="nav-item"><i class="fas fa-file-invoice-dollar nav-icon"></i><span class="nav-text">Invoices</span></a>
+      <div class="nav-section-label" style="margin-top:12px">Insights</div>
+      <a href="reports.html" class="nav-item"><i class="fas fa-chart-pie nav-icon"></i><span class="nav-text">Reports</span></a>
+      <a href="activity.html" class="nav-item"><i class="fas fa-clock-rotate-left nav-icon"></i><span class="nav-text">Activity</span></a>
+      <div class="nav-section-label" style="margin-top:12px">Account</div>
+      <a href="profile.html" class="nav-item"><i class="fas fa-user-gear nav-icon"></i><span class="nav-text">Profile</span></a>
+      <a href="settings.html" class="nav-item"><i class="fas fa-sliders nav-icon"></i><span class="nav-text">Settings</span></a>
+    </nav>
+    <div class="sidebar-user" onclick="location.href='profile.html'"><div class="sidebar-avatar"><i class="fas fa-user"></i></div><div><div class="sidebar-user-info">User</div><div class="sidebar-user-role">Role</div></div></div>
+  </aside>
+
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        <div><div class="topbar-title">Quotation Comparison</div><div class="topbar-breadcrumb"><a href="dashboard.html">Home</a> / Comparison</div></div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-search"><i class="fas fa-search"></i><input type="text" placeholder="Search anything…"/></div>
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"><i class="fas fa-sun"></i></button>
+        <button class="topbar-btn" id="notifBtn"><i class="fas fa-bell"></i><span class="notif-dot"></span></button>
+        <div style="position:relative">
+          <div class="topbar-avatar" id="profileAvatarBtn"><i class="fas fa-user"></i></div>
+          <div class="profile-dropdown" id="profileDropdown">
+            <div class="profile-dropdown-header"><div class="profile-dropdown-name">User</div><div class="profile-dropdown-email">user@company.com</div></div>
+            <a href="profile.html" class="profile-dropdown-item"><i class="fas fa-user"></i> My Profile</a><a href="settings.html" class="profile-dropdown-item"><i class="fas fa-gear"></i> Settings</a>
+            <a href="login.html" class="profile-dropdown-item danger"><i class="fas fa-right-from-bracket"></i> Log Out</a>
+          </div>
+        </div>
+        <div class="notif-panel" id="notifPanel"><div class="notif-panel-header"><div class="notif-panel-title">Notifications</div><button class="notif-panel-clear">Clear all</button></div></div>
+      </div>
+    </header>
+
+    <main class="page-content">
+      <div class="page-header mb-24">
+        <h1 class="page-title">Quotation Comparison</h1>
+        <p class="page-subtitle">RFQ: Office Furniture Procurement Q2 · 3 quotations received</p>
+      </div>
+
+      <!-- Comparison Grid -->
+      <div class="comparison-grid" style="grid-template-columns:160px 1fr 1fr 1fr; overflow-x:auto">
+        <!-- Criteria Column -->
+        <div class="comparison-col criteria">
+          <div class="comparison-cell header" style="height:76px;display:flex;align-items:center"><span class="criteria-label">Criteria</span></div>
+          <div class="comparison-cell"><span class="criteria-label">Grand Total</span></div>
+          <div class="comparison-cell"><span class="criteria-label">GST %</span></div>
+          <div class="comparison-cell"><span class="criteria-label">Delivery (days)</span></div>
+          <div class="comparison-cell"><span class="criteria-label">Vendor Rating</span></div>
+          <div class="comparison-cell"><span class="criteria-label">Payment Terms</span></div>
+          <div class="comparison-cell"><span class="criteria-label">Action</span></div>
+        </div>
+        <!-- Vendor columns will be injected here via JS -->
+      </div>
+
+      <div class="mt-16 text-sm text-green">
+        <i class="fas fa-info-circle"></i> Green column = lowest price. Selecting a vendor initiates the approval workflow.
+      </div>
+    </main>
+  </div>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const data = await apiFetch('/quotations/compare');
+        
+        if (!data || !data.rfq) {
+            document.querySelector('.page-subtitle').textContent = 'No quotations available to compare.';
+            return;
+        }
+
+        const { rfq, quotations } = data;
+        
+        // Update header
+        document.querySelector('.page-subtitle').textContent = `RFQ: ${rfq.title} · ${rfq.quotations_count} quotations received`;
+        
+        const grid = document.querySelector('.comparison-grid');
+        grid.style.gridTemplateColumns = `160px repeat(${quotations.length}, 1fr)`;
+        
+        quotations.forEach((quot, index) => {
+            const isBest = index === 0; // Since backend sorts by total_price ascending
+            const col = document.createElement('div');
+            col.className = `comparison-col ${isBest ? 'best' : ''}`;
+            if (!isBest) col.style.borderLeft = '1px solid var(--divider)';
+            
+            // Extract payment terms from notes, default to 30 days
+            const paymentTermsMatch = quot.notes.match(/payment terms?:?\s*(.*)/i);
+            const paymentTerms = paymentTermsMatch ? paymentTermsMatch[1] : '30 days';
+            
+            col.innerHTML = `
+              <div class="comparison-cell header" style="height:76px">
+                <div class="fw-600">${quot.vendor_name}</div>
+                ${isBest ? '<div class="best-tag"><i class="fas fa-star" style="font-size:.55rem"></i> Lowest price</div>' : '<div style="height:20px"></div>'}
+              </div>
+              <div class="comparison-cell"><span class="${isBest ? 'text-green' : ''} fw-600">₹${quot.total_price.toLocaleString('en-IN')}</span></div>
+              <div class="comparison-cell"><span class="fw-500">18%</span></div>
+              <div class="comparison-cell"><span class="${isBest ? 'text-green' : 'text-danger'} fw-600">${quot.delivery_timeline}</span></div>
+              <div class="comparison-cell"><span class="stars">★★★★<span class="dim">★</span></span><span class="star-num">${quot.vendor_rating || '0.0'}</span></div>
+              <div class="comparison-cell"><span class="fw-500">${paymentTerms}</span></div>
+              <div class="comparison-cell">
+                <button class="btn-vb ${isBest ? 'btn-primary-vb' : 'btn-outline-vb'} btn-sm-vb" onclick="approveQuotation(${quot.id})">
+                  ${isBest ? 'Select & Approve' : 'Select'}
+                </button>
+              </div>
+            `;
+            grid.appendChild(col);
+        });
+        
+      } catch (err) {
+        if(err.message.includes('No RFQ')) {
+          document.querySelector('.page-subtitle').textContent = 'No quotations available to compare.';
+        } else {
+          showToast('Failed to load comparison data', 'error');
+        }
+      }
+    });
+
+    async function approveQuotation(quotationId) {
+      if(!confirm('Are you sure you want to approve this quotation? This will generate a Purchase Order.')) return;
+      try {
+        await apiFetch('/approvals/', {
+          method: 'POST',
+          body: JSON.stringify({
+            quotation_id: quotationId,
+            status: 'approved',
+            comments: 'Approved via comparison'
+          })
+        });
+        showToast('Quotation approved & PO generated successfully!', 'success');
+        setTimeout(() => location.href = 'purchase-orders.html', 1500);
+      } catch (err) {
+        showToast(err.message || 'Error approving quotation', 'error');
+      }
+    }
+  </script>
+</body>
+</html>

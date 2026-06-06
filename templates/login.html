@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VendorBridge – Login</title>
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('vb-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <script src="js/api.js"></script>
+  <style>
+    :root, [data-theme="dark"] {
+      --teal:    #2ABFBF;
+      --teal-dk: #1A8F8F;
+      --amber:   #F5A623;
+      --slate:   #1C2B3A;
+      --slate-2: #243447;
+      --slate-3: #2E4057;
+      --muted:   #6B8BA4;
+      --soft:    #EAF4F4;
+      --white:   #FFFFFF;
+      --danger:  #E05C5C;
+    }
+    [data-theme="light"] {
+      --slate:   #F0F5F5;
+      --slate-2: #FFFFFF;
+      --slate-3: #EAF4F4;
+      --muted:   #5A7A94;
+      --white:   #1C2B3A;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--slate);
+      min-height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ── LEFT PANEL ─────────────────────────────── */
+    .brand-panel {
+      width: 45%;
+      background: linear-gradient(145deg, var(--slate-2) 0%, var(--slate-3) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 60px 56px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* decorative circles */
+    .brand-panel::before {
+      content: '';
+      position: absolute;
+      width: 380px; height: 380px;
+      border-radius: 50%;
+      border: 60px solid rgba(42,191,191,.07);
+      top: -90px; right: -90px;
+    }
+    .brand-panel::after {
+      content: '';
+      position: absolute;
+      width: 260px; height: 260px;
+      border-radius: 50%;
+      border: 40px solid rgba(245,166,35,.06);
+      bottom: -60px; left: -60px;
+    }
+
+    .brand-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--teal);
+      display: inline-block;
+      margin-right: 6px;
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
+
+    .brand-label {
+      display: flex;
+      align-items: center;
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 28px;
+    }
+
+    .brand-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      color: var(--white);
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .brand-title em { color: var(--teal); font-style: italic; }
+
+    .brand-desc {
+      color: var(--muted);
+      font-size: .93rem;
+      line-height: 1.7;
+      max-width: 340px;
+      margin-bottom: 44px;
+    }
+
+    .stat-row {
+      display: flex;
+      gap: 32px;
+    }
+    .stat-item { display: flex; flex-direction: column; }
+    .stat-num {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.9rem;
+      color: var(--white);
+      line-height: 1;
+    }
+    .stat-lbl { font-size: .72rem; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; margin-top: 4px; }
+
+    .divider-v {
+      width: 1px; height: 48px;
+      background: rgba(107,139,164,.3);
+      align-self: center;
+    }
+
+    /* workflow pill strip */
+    .workflow-strip {
+      position: absolute;
+      bottom: 44px; left: 56px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      max-width: 300px;
+    }
+    .wf-pill {
+      background: rgba(42,191,191,.1);
+      border: 1px solid rgba(42,191,191,.25);
+      color: var(--teal);
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    /* ── RIGHT PANEL ─────────────────────────────── */
+    .form-panel {
+      width: 55%;
+      background: var(--slate);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 40px;
+      position: relative;
+    }
+
+    /* subtle grid texture */
+    .form-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(42,191,191,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(42,191,191,.035) 1px, transparent 1px);
+      background-size: 36px 36px;
+      pointer-events: none;
+    }
+
+    .form-card {
+      background: var(--slate-2);
+      border: 1px solid rgba(42,191,191,.15);
+      border-radius: 20px;
+      padding: 44px 44px 40px;
+      width: 100%;
+      max-width: 440px;
+      position: relative;
+      box-shadow: 0 24px 64px rgba(0,0,0,.35);
+      animation: slideUp .5s ease both;
+    }
+    @keyframes slideUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+    /* avatar upload */
+    .avatar-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
+    .avatar-ring {
+      width: 84px; height: 84px;
+      border-radius: 50%;
+      border: 2px dashed var(--teal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      background: rgba(42,191,191,.06);
+      transition: background .2s;
+    }
+    .avatar-ring:hover { background: rgba(42,191,191,.12); }
+    .avatar-ring i { font-size: 1.5rem; color: var(--teal); }
+    .avatar-badge {
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 24px; height: 24px;
+      background: var(--amber);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .6rem;
+      color: var(--white);
+    }
+
+    .form-heading {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .form-heading h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+    .form-heading p { font-size: .82rem; color: var(--muted); }
+
+    /* role tabs */
+    .role-tabs {
+      display: flex;
+      background: rgba(0,0,0,.25);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 28px;
+      gap: 2px;
+    }
+    .role-tab {
+      flex: 1;
+      text-align: center;
+      padding: 7px 4px;
+      border-radius: 7px;
+      font-size: .73rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .2s;
+      border: none;
+      background: transparent;
+    }
+    .role-tab.active {
+      background: var(--teal);
+      color: var(--white);
+      box-shadow: 0 2px 12px rgba(42,191,191,.35);
+    }
+    .role-tab:not(.active):hover { color: var(--white); }
+
+    /* inputs */
+    .field-group { margin-bottom: 18px; }
+    .field-label {
+      font-size: .73rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 7px;
+      display: block;
+    }
+    .field-wrap {
+      position: relative;
+    }
+    .field-icon {
+      position: absolute;
+      left: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--muted);
+      font-size: .9rem;
+      pointer-events: none;
+      transition: color .2s;
+    }
+    .field-input {
+      width: 100%;
+      background: rgba(0,0,0,.25);
+      border: 1px solid rgba(107,139,164,.25);
+      border-radius: 10px;
+      padding: 11px 14px 11px 40px;
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .field-input::placeholder { color: rgba(107,139,164,.6); }
+    .field-input:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(42,191,191,.12);
+    }
+    .field-input:focus + .field-icon,
+    .field-wrap:focus-within .field-icon { color: var(--teal); }
+
+    /* eye toggle */
+    .eye-toggle {
+      position: absolute;
+      right: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--muted);
+      cursor: pointer;
+      font-size: .88rem;
+      background: none; border: none;
+      transition: color .2s;
+    }
+    .eye-toggle:hover { color: var(--teal); }
+
+    /* forgot */
+    .forgot-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: -8px;
+      margin-bottom: 20px;
+    }
+    .forgot-link {
+      font-size: .78rem;
+      color: var(--teal);
+      text-decoration: none;
+      transition: opacity .2s;
+    }
+    .forgot-link:hover { opacity: .7; }
+
+    /* login btn */
+    .btn-login {
+      width: 100%;
+      background: linear-gradient(90deg, var(--teal), var(--teal-dk));
+      border: none;
+      border-radius: 10px;
+      padding: 13px;
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .92rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 18px rgba(42,191,191,.3);
+    }
+    .btn-login:hover { opacity: .9; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(42,191,191,.4); }
+    .btn-login:active { transform: translateY(0); }
+
+    .divider-or {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 22px 0;
+    }
+    .divider-or span { font-size: .75rem; color: var(--muted); white-space: nowrap; }
+    .divider-or::before,
+    .divider-or::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(107,139,164,.2);
+    }
+
+    .signup-link {
+      text-align: center;
+      font-size: .82rem;
+      color: var(--muted);
+    }
+    .signup-link a { color: var(--amber); text-decoration: none; font-weight: 600; }
+    .signup-link a:hover { text-decoration: underline; }
+
+    /* top-right nav */
+    .nav-top {
+      position: absolute;
+      top: 28px; right: 32px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-top a {
+      font-size: .78rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-top a:hover { color: var(--white); }
+    .nav-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(107,139,164,.4); }
+    .theme-toggle-btn { background: none; border: none; color: var(--amber); cursor: pointer; font-size: 1rem; margin-left: 10px; transition: transform .2s; }
+    .theme-toggle-btn:hover { transform: rotate(20deg); }
+    .remember-wrap { display: flex; align-items: center; gap: 8px; font-size: .8rem; color: var(--muted); cursor: pointer; }
+    .remember-wrap input { cursor: pointer; accent-color: var(--teal); }
+  </style>
+</head>
+<body>
+
+  <!-- LEFT BRAND PANEL -->
+  <div class="brand-panel">
+    <div class="brand-label"><span class="brand-dot"></span> Procurement ERP</div>
+
+    <h1 class="brand-title">
+      Smarter<br/>
+      Procurement,<br/>
+      <em>Simplified.</em>
+    </h1>
+
+    <p class="brand-desc">
+      VendorBridge centralizes your vendor relationships, RFQs, approvals,
+      and purchase orders into one unified platform — eliminating manual
+      inefficiencies at every step.
+    </p>
+
+    <div class="stat-row">
+      <div class="stat-item">
+        <span class="stat-num">4</span>
+        <span class="stat-lbl">User Roles</span>
+      </div>
+      <div class="divider-v"></div>
+      <div class="stat-item">
+        <span class="stat-num">8</span>
+        <span class="stat-lbl">Core Modules</span>
+      </div>
+      <div class="divider-v"></div>
+      <div class="stat-item">
+        <span class="stat-num">100%</span>
+        <span class="stat-lbl">Paperless</span>
+      </div>
+    </div>
+
+    <div class="workflow-strip">
+      <span class="wf-pill">RFQ</span>
+      <span class="wf-pill">Quotations</span>
+      <span class="wf-pill">Approvals</span>
+      <span class="wf-pill">Purchase Orders</span>
+      <span class="wf-pill">Invoices</span>
+      <span class="wf-pill">Analytics</span>
+    </div>
+  </div>
+
+  <!-- RIGHT FORM PANEL -->
+  <div class="form-panel">
+
+    <div class="nav-top">
+      <a href="registration.html">New to VendorBridge?</a>
+      <div class="nav-dot"></div>
+      <a href="#">Help</a>
+      <button class="theme-toggle-btn" onclick="toggleTheme()"><i class="fas fa-sun"></i></button>
+    </div>
+
+    <div class="form-card">
+
+      <!-- avatar -->
+      <div class="avatar-wrap">
+        <div class="avatar-ring" title="Upload profile photo">
+          <i class="fas fa-user"></i>
+          <span class="avatar-badge"><i class="fas fa-plus"></i></span>
+        </div>
+      </div>
+
+      <!-- heading -->
+      <div class="form-heading">
+        <h2>Welcome Back</h2>
+        <p>Sign in to continue to VendorBridge</p>
+      </div>
+
+      <!-- role tabs -->
+      <div class="role-tabs">
+        <button class="role-tab active" onclick="setRole(this)">Admin</button>
+        <button class="role-tab" onclick="setRole(this)">Manager</button>
+        <button class="role-tab" onclick="setRole(this)">Officer</button>
+        <button class="role-tab" onclick="setRole(this)">Vendor</button>
+      </div>
+
+      <!-- username -->
+      <div class="field-group">
+        <label class="field-label">Username / Email</label>
+        <div class="field-wrap">
+          <input class="field-input" type="text" id="username" placeholder="e.g. john@company.com"/>
+          <i class="fas fa-envelope field-icon"></i>
+        </div>
+      </div>
+
+      <!-- password -->
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <div class="field-wrap">
+          <input class="field-input" type="password" id="password" placeholder="Enter your password"/>
+          <i class="fas fa-lock field-icon"></i>
+          <button class="eye-toggle" onclick="toggleEye(this, 'password')" type="button">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- remember & forgot -->
+      <div class="forgot-row" style="justify-content: space-between; align-items: center;">
+        <label class="remember-wrap">
+          <input type="checkbox" id="rememberMe"> Remember me
+        </label>
+        <a href="#" class="forgot-link">Forgot password?</a>
+      </div>
+
+      <!-- login btn -->
+      <button class="btn-login" onclick="handleLogin()">
+        <i class="fas fa-arrow-right-to-bracket"></i> Sign In
+      </button>
+
+      <div class="divider-or"><span>OR</span></div>
+
+      <div class="signup-link">
+        Don't have an account? <a href="registration.html">Register here</a>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function setRole(btn) {
+      document.querySelectorAll('.role-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function toggleEye(btn, fieldId) {
+      const inp = document.getElementById(fieldId);
+      const ico = btn.querySelector('i');
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        ico.className = 'fas fa-eye-slash';
+      } else {
+        inp.type = 'password';
+        ico.className = 'fas fa-eye';
+      }
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const btn = document.querySelector('.theme-toggle-btn i');
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('vb-theme', next);
+      btn.className = next === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+
+    // Initialize icon on load
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('vb-theme') || 'dark';
+      const btn = document.querySelector('.theme-toggle-btn i');
+      if (btn) btn.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    });
+
+    async function handleLogin() {
+      const u = document.getElementById('username').value.trim();
+      const p = document.getElementById('password').value.trim();
+      const btn = document.querySelector('.btn-login');
+
+      if (!u || !p) {
+        showLoginError(btn, 'Fill in all fields');
+        return;
+      }
+
+      btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Signing in…';
+      btn.disabled = true;
+
+      try {
+        const data = await apiFetch('/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({ email: u, password: p })
+        });
+        
+        // Save auth data
+        setAuthData(data.access_token, data.user);
+        
+        btn.innerHTML = '<i class="fas fa-check"></i> Authenticated!';
+        btn.style.background = 'linear-gradient(90deg,#2ecc71,#27ae60)';
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 1000);
+      } catch (error) {
+        showLoginError(btn, error.message);
+      }
+    }
+    
+    function showLoginError(btn, msg) {
+        btn.style.background = 'linear-gradient(90deg,#E05C5C,#b84444)';
+        btn.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${msg}`;
+        btn.disabled = true;
+        setTimeout(() => {
+          btn.style.background = '';
+          btn.innerHTML = '<i class="fas fa-arrow-right-to-bracket"></i> Sign In';
+          btn.disabled = false;
+        }, 2200);
+    }
+  </script>
+</body>
+</html>
